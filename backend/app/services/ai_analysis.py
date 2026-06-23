@@ -21,6 +21,14 @@ def _get_provider() -> AbstractAIProvider:
         from app.services.ai.openai_provider import OpenAIProvider
         return OpenAIProvider()
 
+    if provider == "gemini":
+        from app.services.ai.gemini_provider import GeminiProvider
+        return GeminiProvider()
+
+    if provider == "groq":
+        from app.services.ai.groq_provider import GroqProvider
+        return GroqProvider()
+
     raise AIProviderError(
         f"Unknown AI provider: '{provider}'. "
         f"Set AI_PROVIDER=openai in your .env file."

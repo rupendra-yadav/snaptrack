@@ -7,9 +7,11 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./snaptrack.db"
 
     # AI provider
-    AI_PROVIDER: str = "openai"       # swap to "gemini" etc. when you add new providers
+    AI_PROVIDER: str = "groq"
     OPENAI_API_KEY: str = ""
-    AI_MODEL: str = "gpt-4o"
+    GEMINI_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
+    AI_MODEL: str = "meta-llama/llama-4-scout-17b-16e-instruct"
 
     # File storage
     UPLOAD_DIR: Path = Path("uploads")
