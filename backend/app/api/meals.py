@@ -30,12 +30,18 @@ async def analyze_meal(
 
     Phase 2 will replace the stub below with the real AIAnalysisService call.
     """
-    # Validate file type
-    if file.content_type not in ("image/jpeg", "image/png", "image/webp"):
-        raise HTTPException(
-            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            detail="Only JPEG, PNG, and WEBP images are supported.",
-        )
+    # Validate file type — be lenient with camera uploads which may have null/unexpected MIME
+    allowed = {"image/jpeg", "image/png", "image/webp", "image/jpg"}
+    content_type = file.content_type or "image/jpeg"
+    if content_type not in allowed:
+        # Fall back to checking file extension
+        ext = Path(file.filename or "").suffix.lower()
+        if ext not in (".jpg", ".jpeg", ".png", ".webp"):
+            raise HTTPException(
+                status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                detail="Only JPEG, PNG, and WEBP images are supported.",
+            )
+        content_type = "image/jpeg"  # treat unknown as jpeg
 
     # Check file size
     contents = await file.read()
@@ -55,7 +61,7 @@ async def analyze_meal(
     # Call the AI service — provider is determined by AI_PROVIDER in .env
     try:
         service = AIAnalysisService()
-        result = await service.analyze(contents, file.content_type)
+        result = await service.analyze(contents, content_type)
     except AIProviderError as e:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
